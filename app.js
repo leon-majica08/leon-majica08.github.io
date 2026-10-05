@@ -2072,10 +2072,11 @@ function createMusicItem(item, index) {
     return `
         <div class="music-item">
             <button
-                class="music-play-button"
-                onclick="playSong(${index})"
-                aria-label="Play song"
-            >
+    class="music-play-button"
+    data-index="${index}"
+    onclick="playSong(${index})"
+    aria-label="Play song"
+>
                 ▶
             </button>
 
