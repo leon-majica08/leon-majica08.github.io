@@ -3406,6 +3406,14 @@ function loadMusicPlayerState() {
 
     /*
      * Remember which song was playing.
+     * It will be restored after the playlist loads.
+     */
+    window.lastSavedSongIndex =
+        state.songIndex;
+}
+
+    /*
+     * Remember which song was playing.
      * We will load it after the playlist is available.
      */
     window.lastSavedSongIndex =
