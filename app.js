@@ -3802,6 +3802,35 @@ function initializeMusicPlayerV2() {
     if (!musicPlayer) return;
 
     loadMusicPlayerState();
+   async function restoreLastMusicPlayerState() {
+
+    const savedIndex =
+        window.lastSavedSongIndex;
+
+    if (
+        typeof savedIndex !== "number" ||
+        !currentPlaylist ||
+        !currentPlaylist.length
+    ) {
+        return;
+    }
+
+    if (
+        savedIndex < 0 ||
+        savedIndex >= currentPlaylist.length
+    ) {
+        return;
+    }
+
+    /*
+     * Load the saved song.
+     * The saved playback position will be
+     * restored by the loadedmetadata event.
+     */
+    await playSong(savedIndex);
+
+    window.lastSavedSongIndex = null;
+}
 
     updateShuffleButton();
     updateRepeatButton();
