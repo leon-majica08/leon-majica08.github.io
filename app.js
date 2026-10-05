@@ -2684,7 +2684,6 @@ function updateSongButtons() {
    ========================================= */
 
 function initializeAudioPlayer() {
-function initializeAudioPlayer() {
 
     const player =
         $("audioPlayer");
