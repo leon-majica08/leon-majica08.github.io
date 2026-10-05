@@ -3412,14 +3412,6 @@ function loadMusicPlayerState() {
         state.songIndex;
 }
 
-    /*
-     * Remember which song was playing.
-     * We will load it after the playlist is available.
-     */
-    window.lastSavedSongIndex =
-        state.songIndex;
-}
-
         if (
             typeof state.shuffleEnabled ===
             "boolean"
@@ -3815,15 +3807,7 @@ function updatePlaybackState() {
     }
 }
 
-
-/* INITIALIZE PLAYER */
-
-function initializeMusicPlayerV2() {
-
-    if (!musicPlayer) return;
-
-    loadMusicPlayerState();
-   async function restoreLastMusicPlayerState() {
+async function restoreLastMusicPlayerState() {
 
     const savedIndex =
         window.lastSavedSongIndex;
@@ -3852,7 +3836,14 @@ function initializeMusicPlayerV2() {
 
     window.lastSavedSongIndex = null;
 }
+/* INITIALIZE PLAYER */
 
+function initializeMusicPlayerV2() {
+
+    if (!musicPlayer) return;
+
+    loadMusicPlayerState();
+   
     updateShuffleButton();
     updateRepeatButton();
     updatePlayPauseButton();
