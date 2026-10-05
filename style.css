@@ -1922,3 +1922,15 @@ video {
 .memory-card {
     contain: layout paint;
 }
+#story {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+#story > * {
+    position: relative;
+    z-index: 1;
+}
