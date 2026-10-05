@@ -3381,16 +3381,23 @@ function loadMusicPlayerState() {
         const state = JSON.parse(saved);
 
         if (
-            typeof state.songIndex === "number" &&
-            state.songIndex >= 0
-        ) {
+    typeof state.songIndex === "number" &&
+    state.songIndex >= 0
+) {
 
-            restorePlaybackPosition =
-                Math.max(
-                    0,
-                    Number(state.currentTime) || 0
-                );
-        }
+    restorePlaybackPosition =
+        Math.max(
+            0,
+            Number(state.currentTime) || 0
+        );
+
+    /*
+     * Remember which song was playing.
+     * We will load it after the playlist is available.
+     */
+    window.lastSavedSongIndex =
+        state.songIndex;
+}
 
         if (
             typeof state.shuffleEnabled ===
