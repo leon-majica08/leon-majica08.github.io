@@ -2684,15 +2684,14 @@ function updateSongButtons() {
    ========================================= */
 
 function initializeAudioPlayer() {
+function initializeAudioPlayer() {
 
     const player =
         $("audioPlayer");
 
-
     if (!player) {
         return;
     }
-
 
     player.addEventListener(
         "play",
@@ -2703,45 +2702,11 @@ function initializeAudioPlayer() {
         }
     );
 
-
     player.addEventListener(
         "pause",
         function () {
 
             updateSongButtons();
-
-        }
-    );
-
-
-    player.addEventListener(
-        "ended",
-        async function () {
-
-            /*
-               Automatically play the next song.
-            */
-
-            const nextIndex =
-                currentSongIndex + 1;
-
-
-            if (
-                currentPlaylist[nextIndex]
-            ) {
-
-                await playSong(
-                    nextIndex
-                );
-
-            } else {
-
-                currentSongIndex =
-                    -1;
-
-                updateSongButtons();
-
-            }
 
         }
     );
