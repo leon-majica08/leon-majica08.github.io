@@ -1898,3 +1898,27 @@ gap: 20px;
     }
 
 }
+/* =========================================
+   LEON & MAJICA — SCROLL PERFORMANCE
+   ========================================= */
+
+html {
+    scroll-behavior: auto;
+}
+
+img,
+video {
+    content-visibility: auto;
+}
+
+.media-grid,
+.photo-grid,
+.video-grid {
+    contain: layout paint;
+}
+
+.music-item,
+.media-item,
+.memory-card {
+    contain: layout paint;
+}
