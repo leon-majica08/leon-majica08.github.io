@@ -2239,6 +2239,19 @@ function loadMusic(records) {
             return item.file_type === "music";
         }
     );
+   /*
+ * Restore the last saved song
+ * after the playlist has been loaded.
+ */
+if (
+    typeof window.lastSavedSongIndex === "number" &&
+    window.lastSavedSongIndex >= 0 &&
+    window.lastSavedSongIndex < currentPlaylist.length
+) {
+
+    restoreLastMusicPlayerState();
+
+}
 
     if (currentPlaylist.length === 0) {
 
