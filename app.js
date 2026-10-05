@@ -4325,27 +4325,31 @@ function updateHeroPreview() {
 
     const applyButton = document.getElementById("previewHeroButton");
 
-    if (applyButton) {
-        applyButton.onclick = () => {
-            const hero = document.querySelector(".hero-section");
+if (applyButton) {
+    applyButton.onclick = () => {
 
-            if (!hero || !imageUrl) {
-                setSettingsStatus("Choose a photo first.");
-                return;
-            }
+        const storySection =
+            document.querySelector("#story, .our-story");
 
-            hero.style.backgroundImage =
-                `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url("${imageUrl}")`;
+        if (!storySection || !imageUrl) {
+            setSettingsStatus("Choose a photo first.");
+            return;
+        }
 
-            hero.style.backgroundPosition = position;
-            hero.style.backgroundSize = "cover";
-            hero.style.backgroundRepeat = "no-repeat";
+        storySection.style.backgroundImage =
+            `linear-gradient(
+                rgba(0,0,0,0.25),
+                rgba(0,0,0,0.25)
+            ), url("${imageUrl}")`;
 
-            setSettingsStatus(
-                "Hero background preview applied. Save/persistence is not connected yet."
-            );
-        };
-    }
+        storySection.style.backgroundPosition = position;
+        storySection.style.backgroundSize = "cover";
+        storySection.style.backgroundRepeat = "no-repeat";
+
+        setSettingsStatus(
+            "Our Story background preview applied. Save/persistence is not connected yet."
+        );
+    };
 }
 
 function setSettingsStatus(message) {
