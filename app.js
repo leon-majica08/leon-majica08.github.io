@@ -3425,94 +3425,741 @@ function updateMediaSession() {
     try {
         navigator.mediaSession.metadata = new MediaMetadata({
             title,
-            artist,
-            album: "Leon & Majica — Our Memories",
-            artwork
-        });
-    } catch (error) {
-        console.warn("Media metadata could not be updated:", error);
-    }
+/* =========================================
+   INITIALIZE PART 3
+   ========================================= */
+
+/* LEON & MAJICA — MUSIC PLAYER v2 */
+
+const musicPlayer =
+    document.getElementById("audioPlayer");
+
+const previousButton =
+    document.getElementById("previousSongButton");
+
+const playPauseButton =
+    document.getElementById("playPauseButton");
+
+const nextButton =
+    document.getElementById("nextSongButton");
+
+const shuffleButton =
+    document.getElementById("shuffleSongButton");
+
+const repeatButton =
+    document.getElementById("repeatSongButton");
+
+const MUSIC_PLAYER_STORAGE_KEY =
+    "leonMajicaMusicPlayerState";
+
+let shuffleEnabled = false;
+let repeatMode = "off";
+let restorePlaybackPosition = null;
+
+
+/* SAVE PLAYER STATE */
+
+function saveMusicPlayerState() {
+
+    if (!musicPlayer) return;
 
     try {
-        navigator.mediaSession.setActionHandler("play", async () => {
-            try {
-                await player.play();
-            } catch (error) {
-                console.warn("Playback could not start:", error);
-            }
-        });
 
-        navigator.mediaSession.setActionHandler("pause", () => {
-            player.pause();
-        });
+        localStorage.setItem(
+            MUSIC_PLAYER_STORAGE_KEY,
+            JSON.stringify({
+                songIndex: currentSongIndex,
+                currentTime:
+                    Number.isFinite(
+                        musicPlayer.currentTime
+                    )
+                        ? musicPlayer.currentTime
+                        : 0,
+                shuffleEnabled,
+                repeatMode
+            })
+        );
 
-        navigator.mediaSession.setActionHandler("previoustrack", async () => {
-            if (currentPlaylist[currentSongIndex - 1]) {
-                await playSong(currentSongIndex - 1);
-            }
-        });
-
-        navigator.mediaSession.setActionHandler("nexttrack", async () => {
-            if (currentPlaylist[currentSongIndex + 1]) {
-                await playSong(currentSongIndex + 1);
-            }
-        });
-
-        navigator.mediaSession.setActionHandler("seekbackward", details => {
-            player.currentTime = Math.max(
-                0,
-                player.currentTime - (details.seekOffset || 10)
-            );
-        });
-
-        navigator.mediaSession.setActionHandler("seekforward", details => {
-            player.currentTime = Math.min(
-                player.duration || Infinity,
-                player.currentTime + (details.seekOffset || 10)
-            );
-        });
     } catch (error) {
-        console.warn("Some media controls are unsupported:", error);
+
+        console.warn(
+            "Could not save music player state:",
+            error
+        );
     }
 }
 
-function updatePlaybackState() {
-    if (!navigator.mediaSession || !player) return;
 
-    navigator.mediaSession.playbackState =
-        player.paused ? "paused" : "playing";
+/* LOAD PLAYER STATE */
 
-    if (Number.isFinite(player.duration) && player.duration > 0) {
-        try {
-            navigator.mediaSession.setPositionState({
-                duration: player.duration,
-                playbackRate: player.playbackRate || 1,
-                position: Math.min(player.currentTime, player.duration)
+function loadMusicPlayerState() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                MUSIC_PLAYER_STORAGE_KEY
+            );
+
+        if (!saved) return null;
+
+        const state = JSON.parse(saved);
+
+        if (
+            typeof state.songIndex === "number" &&
+            state.songIndex >= 0
+        ) {
+
+            restorePlaybackPosition =
+                Math.max(
+                    0,
+                    Number(state.currentTime) || 0
+                );
+        }
+
+        if (
+            typeof state.shuffleEnabled ===
+            "boolean"
+        ) {
+
+            shuffleEnabled =
+                state.shuffleEnabled;
+        }
+
+        if (
+            state.repeatMode === "off" ||
+            state.repeatMode === "all" ||
+            state.repeatMode === "one"
+        ) {
+
+            repeatMode =
+                state.repeatMode;
+        }
+
+        return state;
+
+    } catch (error) {
+
+        console.warn(
+            "Could not load music player state:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+/* UPDATE BUTTONS */
+
+function updateSongButtons() {
+
+    document
+        .querySelectorAll(".music-play-button")
+        .forEach(button => {
+
+            const index =
+                Number(button.dataset.index);
+
+            if (
+                index === currentSongIndex &&
+                musicPlayer &&
+                !musicPlayer.paused
+            ) {
+
+                button.textContent = "❚❚";
+
+            } else {
+
+                button.textContent = "▶";
+            }
+        });
+}
+
+
+function updatePlayPauseButton() {
+
+    if (!playPauseButton || !musicPlayer) {
+        return;
+    }
+
+    playPauseButton.textContent =
+        musicPlayer.paused ? "▶" : "❚❚";
+}
+
+
+function updateShuffleButton() {
+
+    if (!shuffleButton) return;
+
+    shuffleButton.classList.toggle(
+        "active",
+        shuffleEnabled
+    );
+
+    shuffleButton.setAttribute(
+        "aria-pressed",
+        String(shuffleEnabled)
+    );
+
+    shuffleButton.title =
+        shuffleEnabled
+            ? "Shuffle is ON"
+            : "Shuffle is OFF";
+}
+
+
+function updateRepeatButton() {
+
+    if (!repeatButton) return;
+
+    repeatButton.classList.toggle(
+        "active",
+        repeatMode !== "off"
+    );
+
+    repeatButton.setAttribute(
+        "aria-pressed",
+        String(repeatMode !== "off")
+    );
+
+    if (repeatMode === "one") {
+
+        repeatButton.textContent = "🔂";
+        repeatButton.title = "Repeat one";
+
+    } else {
+
+        repeatButton.textContent = "🔁";
+
+        repeatButton.title =
+            repeatMode === "all"
+                ? "Repeat all"
+                : "Repeat off";
+    }
+}
+
+
+/* SHUFFLE */
+
+function toggleShuffle() {
+
+    shuffleEnabled =
+        !shuffleEnabled;
+
+    updateShuffleButton();
+    saveMusicPlayerState();
+}
+
+
+/* REPEAT */
+
+function toggleRepeat() {
+
+    if (repeatMode === "off") {
+
+        repeatMode = "all";
+
+    } else if (repeatMode === "all") {
+
+        repeatMode = "one";
+
+    } else {
+
+        repeatMode = "off";
+    }
+
+    updateRepeatButton();
+    saveMusicPlayerState();
+}
+
+
+/* NEXT SONG */
+
+function getNextSongIndex() {
+
+    if (
+        !currentPlaylist ||
+        currentPlaylist.length === 0
+    ) {
+
+        return -1;
+    }
+
+    if (repeatMode === "one") {
+        return currentSongIndex;
+    }
+
+    if (shuffleEnabled) {
+
+        if (currentPlaylist.length === 1) {
+            return currentSongIndex;
+        }
+
+        let randomIndex;
+
+        do {
+
+            randomIndex =
+                Math.floor(
+                    Math.random() *
+                    currentPlaylist.length
+                );
+
+        } while (
+            randomIndex === currentSongIndex
+        );
+
+        return randomIndex;
+    }
+
+    const nextIndex =
+        currentSongIndex + 1;
+
+    if (
+        nextIndex <
+        currentPlaylist.length
+    ) {
+
+        return nextIndex;
+    }
+
+    return repeatMode === "all"
+        ? 0
+        : -1;
+}
+
+
+/* PREVIOUS SONG */
+
+function getPreviousSongIndex() {
+
+    if (
+        !currentPlaylist ||
+        currentPlaylist.length === 0
+    ) {
+
+        return -1;
+    }
+
+    if (currentSongIndex > 0) {
+        return currentSongIndex - 1;
+    }
+
+    return repeatMode === "all"
+        ? currentPlaylist.length - 1
+        : -1;
+}
+
+
+async function playNextSong() {
+
+    const index =
+        getNextSongIndex();
+
+    if (index >= 0) {
+        await playSong(index);
+    }
+}
+
+
+async function playPreviousSong() {
+
+    if (
+        musicPlayer &&
+        musicPlayer.currentTime > 3
+    ) {
+
+        musicPlayer.currentTime = 0;
+        saveMusicPlayerState();
+        return;
+    }
+
+    const index =
+        getPreviousSongIndex();
+
+    if (index >= 0) {
+        await playSong(index);
+    }
+}
+
+
+/* MEDIA SESSION */
+
+function updateMusicMediaSession() {
+
+    if (
+        !musicPlayer ||
+        !("mediaSession" in navigator)
+    ) {
+
+        return;
+    }
+
+    const title =
+        document
+            .getElementById(
+                "currentSongTitle"
+            )
+            ?.textContent
+            ?.trim() ||
+        "Leon & Majica";
+
+    const artist =
+        document
+            .getElementById(
+                "currentSongArtist"
+            )
+            ?.textContent
+            ?.trim() ||
+        "Leon & Majica";
+
+    const artworkElement =
+        document.getElementById("albumArt");
+
+    const image =
+        artworkElement?.querySelector("img");
+
+    let artwork = [];
+
+    if (image?.src) {
+
+        artwork = [
+            {
+                src: image.src,
+                sizes: "96x96",
+                type: "image/jpeg"
+            },
+            {
+                src: image.src,
+                sizes: "256x256",
+                type: "image/jpeg"
+            },
+            {
+                src: image.src,
+                sizes: "512x512",
+                type: "image/jpeg"
+            }
+        ];
+    }
+
+    try {
+
+        navigator.mediaSession.metadata =
+            new MediaMetadata({
+                title,
+                artist,
+                album:
+                    "Leon & Majica — Our Memories",
+                artwork
             });
+
+    } catch (error) {
+
+        console.warn(
+            "Media metadata error:",
+            error
+        );
+    }
+}
+
+
+function updatePlaybackState() {
+
+    if (
+        !musicPlayer ||
+        !("mediaSession" in navigator)
+    ) {
+
+        return;
+    }
+
+    try {
+
+        navigator.mediaSession.playbackState =
+            musicPlayer.paused
+                ? "paused"
+                : "playing";
+
+        if (
+            Number.isFinite(
+                musicPlayer.duration
+            ) &&
+            musicPlayer.duration > 0
+        ) {
+
+            navigator.mediaSession.setPositionState({
+                duration:
+                    musicPlayer.duration,
+
+                playbackRate:
+                    musicPlayer.playbackRate || 1,
+
+                position:
+                    Math.min(
+                        musicPlayer.currentTime,
+                        musicPlayer.duration
+                    )
+            });
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Media Session update error:",
+            error
+        );
+    }
+}
+
+
+/* INITIALIZE PLAYER */
+
+function initializeMusicPlayerV2() {
+
+    if (!musicPlayer) return;
+
+    loadMusicPlayerState();
+
+    updateShuffleButton();
+    updateRepeatButton();
+    updatePlayPauseButton();
+    updateSongButtons();
+
+    musicPlayer.addEventListener(
+        "play",
+        () => {
+
+            updatePlayPauseButton();
+            updateSongButtons();
+            updatePlaybackState();
+            saveMusicPlayerState();
+        }
+    );
+
+    musicPlayer.addEventListener(
+        "pause",
+        () => {
+
+            updatePlayPauseButton();
+            updateSongButtons();
+            updatePlaybackState();
+            saveMusicPlayerState();
+        }
+    );
+
+    musicPlayer.addEventListener(
+        "timeupdate",
+        () => {
+
+            saveMusicPlayerState();
+            updatePlaybackState();
+        }
+    );
+
+    musicPlayer.addEventListener(
+        "loadedmetadata",
+        () => {
+
+            if (
+                restorePlaybackPosition !== null
+            ) {
+
+                try {
+
+                    musicPlayer.currentTime =
+                        Math.min(
+                            restorePlaybackPosition,
+                            musicPlayer.duration || 0
+                        );
+
+                } catch (error) {}
+
+                restorePlaybackPosition = null;
+            }
+
+            updatePlaybackState();
+        }
+    );
+
+    musicPlayer.addEventListener(
+        "ended",
+        async () => {
+
+            if (repeatMode === "one") {
+
+                musicPlayer.currentTime = 0;
+
+                try {
+                    await musicPlayer.play();
+                } catch (error) {}
+
+                return;
+            }
+
+            await playNextSong();
+        }
+    );
+
+    if ("mediaSession" in navigator) {
+
+        try {
+
+            navigator.mediaSession.setActionHandler(
+                "play",
+                () => musicPlayer.play()
+            );
+
+            navigator.mediaSession.setActionHandler(
+                "pause",
+                () => musicPlayer.pause()
+            );
+
+            navigator.mediaSession.setActionHandler(
+                "previoustrack",
+                playPreviousSong
+            );
+
+            navigator.mediaSession.setActionHandler(
+                "nexttrack",
+                playNextSong
+            );
+
+            navigator.mediaSession.setActionHandler(
+                "seekbackward",
+                details => {
+
+                    musicPlayer.currentTime =
+                        Math.max(
+                            0,
+                            musicPlayer.currentTime -
+                            (details.seekOffset || 10)
+                        );
+
+                    saveMusicPlayerState();
+                }
+            );
+
+            navigator.mediaSession.setActionHandler(
+                "seekforward",
+                details => {
+
+                    musicPlayer.currentTime =
+                        Math.min(
+                            musicPlayer.duration || Infinity,
+                            musicPlayer.currentTime +
+                            (details.seekOffset || 10)
+                        );
+
+                    saveMusicPlayerState();
+                }
+            );
+
         } catch (error) {
-            // Position reporting is optional on some browsers.
+
+            console.warn(
+                "Media controls error:",
+                error
+            );
         }
     }
 }
 
-if (player) {
-    player.addEventListener("play", () => {
-        updateMediaSession();
-        updatePlaybackState();
-    });
 
-    player.addEventListener("pause", updatePlaybackState);
-    player.addEventListener("playing", updatePlaybackState);
-    player.addEventListener("timeupdate", updatePlaybackState);
-    player.addEventListener("ratechange", updatePlaybackState);
-    player.addEventListener("loadedmetadata", updatePlaybackState);
+/* BUTTON EVENTS */
 
-    player.addEventListener("ended", () => {
-        updatePlaybackState();
-    });
+if (previousButton) {
+
+    previousButton.addEventListener(
+        "click",
+        playPreviousSong
+    );
 }
 
+
+if (nextButton) {
+
+    nextButton.addEventListener(
+        "click",
+        playNextSong
+    );
 }
+
+
+if (playPauseButton) {
+
+    playPauseButton.addEventListener(
+        "click",
+        async () => {
+
+            if (!musicPlayer) return;
+
+            if (musicPlayer.paused) {
+
+                if (
+                    currentSongIndex >= 0 &&
+                    musicPlayer.src
+                ) {
+
+                    await musicPlayer.play();
+
+                } else if (
+                    currentPlaylist?.length
+                ) {
+
+                    await playSong(0);
+                }
+
+            } else {
+
+                musicPlayer.pause();
+            }
+        }
+    );
+}
+
+
+if (shuffleButton) {
+
+    shuffleButton.addEventListener(
+        "click",
+        toggleShuffle
+    );
+}
+
+
+if (repeatButton) {
+
+    repeatButton.addEventListener(
+        "click",
+        toggleRepeat
+    );
+}
+
+
+window.addEventListener(
+    "beforeunload",
+    saveMusicPlayerState
+);
+
+
+/* START */
+
+initializeAudioPlayer();
+
+initializeMusicPlayerV2();
+
+updateShuffleButton();
+updateRepeatButton();
+updatePlayPauseButton();
+updateSongButtons();
+
+
+initializeMessageForm();
+
+/* =========================================
+   FAVORITE + DATE HELPERS
+   ========================================= */
 initializeMessageForm();
 /* =========================================
    FAVORITE + DATE HELPERS
