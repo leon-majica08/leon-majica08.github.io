@@ -4485,29 +4485,140 @@ function updateHeroPreview() {
  const applyButton = document.getElementById("previewHeroButton");
 
 if (applyButton) {
-    applyButton.onclick = () => {
 
-        const storyHero =
+    applyButton.onclick = async () => {
+
+        const hero =
             document.querySelector(".hero-section");
 
-        if (!storyHero || !imageUrl) {
-            setSettingsStatus("Choose a photo first.");
+        const source =
+            document.getElementById(
+                "heroPhotoSource"
+            )?.value || "gallery";
+
+        const position =
+            document.getElementById(
+                "heroPosition"
+            )?.value || "center";
+
+        if (!hero || !imageUrl) {
+
+            setSettingsStatus(
+                "Choose a photo first."
+            );
+
             return;
         }
 
-        storyHero.style.backgroundImage =
-            `linear-gradient(
-                rgba(0,0,0,0.25),
-                rgba(0,0,0,0.25)
-            ), url("${imageUrl}")`;
+        try {
 
-        storyHero.style.backgroundPosition = position;
-        storyHero.style.backgroundSize = "cover";
-        storyHero.style.backgroundRepeat = "no-repeat";
+            let backgroundPath = "";
 
-        setSettingsStatus(
-            "Our Story background preview applied."
-        );
+            /*
+             * GALLERY PHOTO
+             */
+            if (source === "gallery") {
+
+                const option =
+                    document.getElementById(
+                        "heroGalleryPhoto"
+                    )?.selectedOptions?.[0];
+
+                backgroundPath =
+                    option?.dataset?.path || "";
+
+                if (!backgroundPath) {
+
+                    setSettingsStatus(
+                        "Could not find the selected photo."
+                    );
+
+                    return;
+                }
+            }
+
+            /*
+             * UPLOADED PHOTO
+             */
+            if (source === "upload") {
+
+                const file =
+                    document.getElementById(
+                        "heroPhotoUpload"
+                    )?.files?.[0];
+
+                if (!file) {
+
+                    setSettingsStatus(
+                        "Choose a photo first."
+                    );
+
+                    return;
+                }
+
+                setSettingsStatus(
+                    "Uploading Our Story background..."
+                );
+
+                const record =
+                    await uploadMediaFile(
+                        file,
+                        "photo"
+                    );
+
+                if (!record?.file_path) {
+
+                    throw new Error(
+                        "Background upload did not return a file path."
+                    );
+                }
+
+                backgroundPath =
+                    record.file_path;
+            }
+
+            /*
+             * SAVE TO SUPABASE
+             */
+            await saveStoryBackgroundSettings(
+                backgroundPath,
+                source
+            );
+
+            /*
+             * APPLY TO OUR STORY HERO
+             */
+            hero.style.backgroundImage =
+                `linear-gradient(
+                    rgba(0,0,0,0.25),
+                    rgba(0,0,0,0.25)
+                ), url("${imageUrl}")`;
+
+            hero.style.backgroundPosition =
+                position;
+
+            hero.style.backgroundSize =
+                "cover";
+
+            hero.style.backgroundRepeat =
+                "no-repeat";
+
+            setSettingsStatus(
+                "Our Story background saved successfully. ❤️"
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Our Story background save error:",
+                error
+            );
+
+            setSettingsStatus(
+                "Could not save Our Story background: " +
+                (error?.message || "Unknown error.")
+            );
+        }
     };
 }
 
