@@ -4190,6 +4190,8 @@ const SETTINGS_DEFAULTS = {
     heroGalleryPhoto: "",
     heroBrightness: 75,
     heroPosition: "center",
+   storyBackgroundPath: "",
+storyBackgroundSource: "gallery",
     musicPlayerStyle: "classic",
     musicPlayerBackground: "default",
     musicArtworkUrl: "",
@@ -4210,6 +4212,11 @@ function getSettingsFormData() {
         heroGalleryPhoto: value("heroGalleryPhoto")?.value || "",
         heroBrightness: Number(value("heroBrightness")?.value || 75),
         heroPosition: value("heroPosition")?.value || "center",
+       storyBackgroundPath:
+    value("storyBackgroundPath")?.value || "",
+
+storyBackgroundSource:
+    value("storyBackgroundSource")?.value || "gallery",
         musicPlayerStyle: value("musicPlayerStyle")?.value || "classic",
         musicPlayerBackground:
             value("musicPlayerBackground")?.value || "default",
