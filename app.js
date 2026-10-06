@@ -4323,31 +4323,31 @@ function updateHeroPreview() {
             "<span>Choose or upload a photo to preview ❤️</span>";
     }
 
-    const applyButton = document.getElementById("previewHeroButton");
+ const applyButton = document.getElementById("previewHeroButton");
 
 if (applyButton) {
     applyButton.onclick = () => {
 
-        const storySection =
-            document.querySelector("#story, .our-story");
+        const storyHero =
+            document.querySelector(".hero-section");
 
-        if (!storySection || !imageUrl) {
+        if (!storyHero || !imageUrl) {
             setSettingsStatus("Choose a photo first.");
             return;
         }
 
-        storySection.style.backgroundImage =
+        storyHero.style.backgroundImage =
             `linear-gradient(
                 rgba(0,0,0,0.25),
                 rgba(0,0,0,0.25)
             ), url("${imageUrl}")`;
 
-        storySection.style.backgroundPosition = position;
-        storySection.style.backgroundSize = "cover";
-        storySection.style.backgroundRepeat = "no-repeat";
+        storyHero.style.backgroundPosition = position;
+        storyHero.style.backgroundSize = "cover";
+        storyHero.style.backgroundRepeat = "no-repeat";
 
         setSettingsStatus(
-            "Our Story background preview applied. Save/persistence is not connected yet."
+            "Our Story background preview applied."
         );
     };
 }
