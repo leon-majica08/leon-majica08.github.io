@@ -4526,7 +4526,7 @@ if (applyButton) {
                     )?.selectedOptions?.[0];
 
                 backgroundPath =
-                    option?.dataset?.path || "";
+    option?.value || "";
 
                 if (!backgroundPath) {
 
