@@ -1493,6 +1493,158 @@ async function saveSiteBackgroundSettings(
     return result.data;
 }
 /* =========================================
+   OUR STORY BACKGROUND SETTINGS
+   ========================================= */
+
+async function getStoryBackgroundSettings() {
+
+    requireSupabase();
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("site_settings")
+        .select("story_background_path, story_background_source")
+        .limit(1)
+        .maybeSingle();
+
+    if (error) {
+        console.error(
+            "Error loading Our Story background settings:",
+            error
+        );
+
+        return null;
+    }
+
+    return data;
+}
+
+
+async function saveStoryBackgroundSettings(
+    backgroundPath,
+    backgroundSource
+) {
+
+    requireSupabase();
+
+    const {
+        data: existing,
+        error: existingError
+    } = await supabaseClient
+        .from("site_settings")
+        .select("id")
+        .limit(1)
+        .maybeSingle();
+
+    if (existingError) {
+        throw existingError;
+    }
+
+    const settings = {
+        story_background_path:
+            backgroundPath || null,
+
+        story_background_source:
+            backgroundSource || "gallery",
+
+        updated_at:
+            new Date().toISOString()
+    };
+
+    let result;
+
+    if (existing?.id) {
+
+        result = await supabaseClient
+            .from("site_settings")
+            .update(settings)
+            .eq("id", existing.id)
+            .select()
+            .single();
+
+    } else {
+
+        result = await supabaseClient
+            .from("site_settings")
+            .insert(settings)
+            .select()
+            .single();
+
+    }
+
+    if (result.error) {
+
+        console.error(
+            "Error saving Our Story background:",
+            result.error
+        );
+
+        throw result.error;
+    }
+
+    return result.data;
+}
+
+
+/* =========================================
+   APPLY SAVED OUR STORY BACKGROUND
+   ========================================= */
+
+async function loadSavedStoryBackground() {
+
+    try {
+
+        const settings =
+            await getStoryBackgroundSettings();
+
+        if (!settings?.story_background_path) {
+            return;
+        }
+
+        const imageUrl =
+            await getSignedUrl(
+                settings.story_background_path
+            );
+
+        if (!imageUrl) {
+            return;
+        }
+
+        const storyHero =
+            document.querySelector(".hero-section");
+
+        if (!storyHero) {
+            return;
+        }
+
+        storyHero.style.backgroundImage =
+            `linear-gradient(
+                rgba(0,0,0,0.25),
+                rgba(0,0,0,0.25)
+            ), url("${imageUrl}")`;
+
+        storyHero.style.backgroundSize =
+            "cover";
+
+        storyHero.style.backgroundPosition =
+            "center";
+
+        storyHero.style.backgroundRepeat =
+            "no-repeat";
+
+    } catch (error) {
+
+        console.error(
+            "Error loading saved Our Story background:",
+            error
+        );
+
+    }
+
+}
+/* =========================================
    APPLY SAVED SITE BACKGROUND
    ========================================= */
 
