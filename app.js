@@ -1244,6 +1244,7 @@ loadHeroGalleryPhotos();
 initializeSiteBackgroundSettings();
 
 loadSavedSiteBackground();
+loadSavedStoryBackground();
  
 
     const messageButton =
