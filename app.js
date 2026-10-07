@@ -2246,9 +2246,11 @@ async function loadPhotos(records) {
 
     grid.innerHTML = "";
 
-    const photos = (records || []).filter(
-        item => item.file_type === "photo"
-    );
+    const photos = (records || []).filter(item =>
+    item.file_type === "photo" ||
+    item.file_type === "image" ||
+    (item.mime_type || "").startsWith("image/")
+);
    viewerPhotoList = photos.map(item => ({
     ...item,
     signed_url: "",
@@ -2308,9 +2310,10 @@ async function loadVideos(records) {
 
     grid.innerHTML = "";
 
-    const videos = (records || []).filter(
-        item => item.file_type === "video"
-    );
+    const videos = (records || []).filter(item =>
+    item.file_type === "video" ||
+    (item.mime_type || "").startsWith("video/")
+);
 
     if (videos.length === 0) {
         grid.innerHTML = `
@@ -2358,11 +2361,11 @@ function loadMusic(records) {
 
     list.innerHTML = "";
 
-    currentPlaylist = records.filter(
-        function (item) {
-            return item.file_type === "music";
-        }
-    );
+    currentPlaylist = records.filter(item =>
+    item.file_type === "music" ||
+    item.file_type === "audio" ||
+    (item.mime_type || "").startsWith("audio/")
+);
    /*
  * Restore the last saved song
  * after the playlist has been loaded.
