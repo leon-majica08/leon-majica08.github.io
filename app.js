@@ -248,19 +248,26 @@ async function openApp() {
     showElement(app);
 
     if (!supabaseClient) {
-        await initializeSupabase();
+        const initialized = await initializeSupabase();
+
+        if (!initialized) {
+            return;
+        }
     }
 
-    if (supabaseClient) {
-        await loadHeroGalleryPhotos();
-        await loadSiteBackgroundGallery();
-        await loadSavedSiteBackground();
-        await loadMusicGalleryPhotos();
-    }
+    /*
+       Load everything only AFTER Supabase
+       has finished initializing.
+    */
 
-    if (typeof loadAllMemories === "function") {
-        await loadAllMemories();
-    }
+    await Promise.allSettled([
+        loadAllMemories(),
+        loadHeroGalleryPhotos(),
+        loadSiteBackgroundGallery(),
+        loadMusicGalleryPhotos(),
+        loadSavedSiteBackground(),
+        loadSavedStoryBackground()
+    ]);
 }
 
 
