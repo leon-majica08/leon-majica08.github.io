@@ -1211,11 +1211,9 @@ async function initializeApp() {
    
     initializeMusicBackgroundSettings();
 
-loadHeroGalleryPhotos();
+initializeMusicBackgroundSettings();
 
 initializeSiteBackgroundSettings();
-
-loadSavedSiteBackground();
 loadSavedStoryBackground();
  
 
