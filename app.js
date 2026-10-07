@@ -150,61 +150,47 @@ async function initializeSupabase() {
    ========================================= */
 
 function initializeLogin() {
-
-    const loginForm =
-        $("loginForm");
+    const loginForm = $("loginForm");
 
     if (!loginForm) {
         return;
     }
 
+    loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
 
-    loginForm.addEventListener(
-        "submit",
-        function (event) {
+        const username =
+            $("username")?.value.trim();
 
-            event.preventDefault();
+        const password =
+            $("password")?.value;
 
+        const error =
+            $("loginError");
 
-            const username =
-                $("username")?.value.trim();
+        if (
+            username === LOGIN_USERNAME &&
+            password === LOGIN_PASSWORD
+        ) {
+            sessionStorage.setItem(
+                "leonMajicaLoggedIn",
+                "true"
+            );
 
-            const password =
-                $("password")?.value;
-
-
-            const error =
-                $("loginError");
-
-
-            if (
-                username === LOGIN_USERNAME &&
-                password === LOGIN_PASSWORD
-            ) {
-
-                sessionStorage.setItem(
-                    "leonMajicaLoggedIn",
-                    "true"
-                );
-
-                if (error) {
-                    error.textContent = "";
-                }
-
-                openApp();
-
-            } else {
-
-                if (error) {
-                    error.textContent =
-                        "Incorrect username or password.";
-                }
-
+            if (error) {
+                error.textContent = "";
             }
 
-        }
-    );
+            openApp();
 
+        } else {
+
+            if (error) {
+                error.textContent =
+                    "Incorrect username or password.";
+            }
+        }
+    });
 }
 
 
