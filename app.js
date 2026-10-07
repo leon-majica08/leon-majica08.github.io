@@ -197,14 +197,12 @@ function initializeLogin() {
 /* =========================================
    CHECK LOGIN
    ========================================= */
-
 function checkLogin() {
 
     const loggedIn =
         sessionStorage.getItem(
             "leonMajicaLoggedIn"
         );
-
 
     if (loggedIn === "true") {
 
@@ -215,7 +213,6 @@ function checkLogin() {
         showLogin();
 
     }
-
 }
 
 
@@ -244,44 +241,26 @@ function showLogin() {
 
 async function openApp() {
 
-    const loginScreen =
-        $("loginScreen");
-
-    const app =
-        $("app");
-
+    const loginScreen = $("loginScreen");
+    const app = $("app");
 
     hideElement(loginScreen);
     showElement(app);
 
-
-    /*
-       Supabase is initialized when the app
-       opens.
-    */
-
     if (!supabaseClient) {
         await initializeSupabase();
     }
-   if (supabaseClient) {
-    await loadHeroGalleryPhotos();
-    await loadSiteBackgroundGallery();
-    await loadSavedSiteBackground();
-    await loadMusicGalleryPhotos();
-   }
 
-
-    /*
-       These functions will be created in
-       the next app.js sections.
-    */
-
-    if (typeof loadAllMemories === "function") {
-
-        await loadAllMemories();
-
+    if (supabaseClient) {
+        await loadHeroGalleryPhotos();
+        await loadSiteBackgroundGallery();
+        await loadSavedSiteBackground();
+        await loadMusicGalleryPhotos();
     }
 
+    if (typeof loadAllMemories === "function") {
+        await loadAllMemories();
+    }
 }
 
 
@@ -5250,4 +5229,5 @@ function initializeSiteBackgroundSettings() {
         });
 
     loadSiteBackgroundGallery();
+}
 }
