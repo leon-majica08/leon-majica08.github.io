@@ -1211,10 +1211,9 @@ async function initializeApp() {
    
     initializeMusicBackgroundSettings();
 
-initializeMusicBackgroundSettings();
-
-initializeSiteBackgroundSettings();
-loadSavedStoryBackground();
+    initializeSiteBackgroundSettings();
+   
+    loadSavedStoryBackground();
  
 
     const messageButton =
