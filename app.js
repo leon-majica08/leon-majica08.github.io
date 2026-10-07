@@ -4405,8 +4405,132 @@ function updateHeroSourceControls() {
         uploadWrap.hidden = source !== "upload";
     }
 }
+async function getStoryBackgroundSettings() {
+    requireSupabase();
+
+    const { data, error } = await supabaseClient
+        .from("site_settings")
+        .select(
+            "story_background_path, story_background_source"
+        )
+        .limit(1)
+        .maybeSingle();
+
+    if (error) {
+        console.error(
+            "Error loading Our Story background settings:",
+            error
+        );
+        return null;
+    }
+
+    return data;
+}
 
 
+async function saveStoryBackgroundSettings(
+    backgroundPath,
+    backgroundSource
+) {
+    requireSupabase();
+
+    const {
+        data: existing,
+        error: existingError
+    } = await supabaseClient
+        .from("site_settings")
+        .select("id")
+        .limit(1)
+        .maybeSingle();
+
+    if (existingError) {
+        throw existingError;
+    }
+
+    const settings = {
+        story_background_path:
+            backgroundPath || null,
+
+        story_background_source:
+            backgroundSource || "gallery",
+
+        updated_at:
+            new Date().toISOString()
+    };
+
+    let result;
+
+    if (existing?.id) {
+
+        result = await supabaseClient
+            .from("site_settings")
+            .update(settings)
+            .eq("id", existing.id)
+            .select()
+            .single();
+
+    } else {
+
+        result = await supabaseClient
+            .from("site_settings")
+            .insert(settings)
+            .select()
+            .single();
+    }
+
+    if (result.error) {
+        throw result.error;
+    }
+
+    return result.data;
+}
+
+
+async function loadSavedStoryBackground() {
+
+    try {
+
+        const settings =
+            await getStoryBackgroundSettings();
+
+        if (!settings?.story_background_path) {
+            return;
+        }
+
+        const imageUrl =
+            await getSignedUrl(
+                settings.story_background_path
+            );
+
+        const hero =
+            document.querySelector(
+                ".hero-section"
+            );
+
+        if (!imageUrl || !hero) {
+            return;
+        }
+
+        hero.style.backgroundImage =
+            `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url("${imageUrl}")`;
+
+        hero.style.backgroundSize =
+            "cover";
+
+        hero.style.backgroundPosition =
+            "center";
+
+        hero.style.backgroundRepeat =
+            "no-repeat";
+
+    } catch (error) {
+
+        console.error(
+            "Error loading saved Our Story background:",
+            error
+        );
+    }
+}
 function updateHeroPreview() {
     const preview = document.getElementById("heroPreview");
     if (!preview) return;
@@ -4456,145 +4580,124 @@ function updateHeroPreview() {
             "<span>Choose or upload a photo to preview ❤️</span>";
     }
 
- const applyButton = document.getElementById("previewHeroButton");
+    const applyButton =
+        document.getElementById("previewHeroButton");
 
-if (applyButton) {
+    if (applyButton) {
+        applyButton.onclick = async () => {
 
-    applyButton.onclick = async () => {
+            const hero =
+                document.querySelector(".hero-section");
 
-        const hero =
-            document.querySelector(".hero-section");
-
-        const source =
-            document.getElementById(
-                "heroPhotoSource"
-            )?.value || "gallery";
-
-        const position =
-            document.getElementById(
-                "heroPosition"
-            )?.value || "center";
-
-        if (!hero || !imageUrl) {
-
-            setSettingsStatus(
-                "Choose a photo first."
-            );
-
-            return;
-        }
-
-        try {
-
-            let backgroundPath = "";
-
-            /*
-             * GALLERY PHOTO
-             */
-            if (source === "gallery") {
-
-                const option =
-                    document.getElementById(
-                        "heroGalleryPhoto"
-                    )?.selectedOptions?.[0];
-
-                backgroundPath =
-    option?.value || "";
-
-                if (!backgroundPath) {
-
-                    setSettingsStatus(
-                        "Could not find the selected photo."
-                    );
-
-                    return;
-                }
+            if (!hero) {
+                setSettingsStatus(
+                    "Our Story section not found."
+                );
+                return;
             }
 
-            /*
-             * UPLOADED PHOTO
-             */
-            if (source === "upload") {
+            try {
 
-                const file =
-                    document.getElementById(
-                        "heroPhotoUpload"
-                    )?.files?.[0];
+                let finalImageUrl = imageUrl;
+                let backgroundPath = "";
 
-                if (!file) {
+                if (source === "gallery") {
+
+                    backgroundPath =
+                        document.getElementById(
+                            "heroGalleryPhoto"
+                        )?.value || "";
+
+                    if (!backgroundPath || !finalImageUrl) {
+                        setSettingsStatus(
+                            "Choose a gallery photo first."
+                        );
+                        return;
+                    }
+
+                } else if (source === "upload") {
+
+                    const file =
+                        document.getElementById(
+                            "heroPhotoUpload"
+                        )?.files?.[0];
+
+                    if (!file) {
+                        setSettingsStatus(
+                            "Choose a photo to upload first."
+                        );
+                        return;
+                    }
 
                     setSettingsStatus(
-                        "Choose a photo first."
+                        "Uploading Our Story background..."
                     );
 
-                    return;
+                    const record =
+                        await uploadMediaFile(
+                            file,
+                            "photo"
+                        );
+
+                    backgroundPath =
+                        record?.file_path || "";
+
+                    if (!backgroundPath) {
+                        throw new Error(
+                            "Background upload did not return a file path."
+                        );
+                    }
+
+                    finalImageUrl =
+                        await getSignedUrl(
+                            backgroundPath
+                        );
+
+                    if (!finalImageUrl) {
+                        throw new Error(
+                            "Could not create a signed URL for the background."
+                        );
+                    }
                 }
 
-                setSettingsStatus(
-                    "Uploading Our Story background..."
+                await saveStoryBackgroundSettings(
+                    backgroundPath,
+                    source
                 );
 
-                const record =
-                    await uploadMediaFile(
-                        file,
-                        "photo"
-                    );
+                hero.style.backgroundImage =
+                    `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url("${finalImageUrl}")`;
 
-                if (!record?.file_path) {
+                hero.style.backgroundPosition =
+                    position;
 
-                    throw new Error(
-                        "Background upload did not return a file path."
-                    );
-                }
+                hero.style.backgroundSize =
+                    "cover";
 
-                backgroundPath =
-                    record.file_path;
+                hero.style.backgroundRepeat =
+                    "no-repeat";
+
+                setSettingsStatus(
+                    "Our Story background saved successfully ❤️"
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Our Story background save error:",
+                    error
+                );
+
+                setSettingsStatus(
+                    "Could not save Our Story background: " +
+                    (error?.message ||
+                        "Unknown error.")
+                );
             }
-
-            /*
-             * SAVE TO SUPABASE
-             */
-            await saveStoryBackgroundSettings(
-                backgroundPath,
-                source
-            );
-
-            /*
-             * APPLY TO OUR STORY HERO
-             */
-            hero.style.backgroundImage =
-                `linear-gradient(
-                    rgba(0,0,0,0.25),
-                    rgba(0,0,0,0.25)
-                ), url("${imageUrl}")`;
-
-            hero.style.backgroundPosition =
-                position;
-
-            hero.style.backgroundSize =
-                "cover";
-
-            hero.style.backgroundRepeat =
-                "no-repeat";
-
-            setSettingsStatus(
-                "Our Story background saved successfully. ❤️"
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Our Story background save error:",
-                error
-            );
-
-            setSettingsStatus(
-                "Could not save Our Story background: " +
-                (error?.message || "Unknown error.")
-            );
-        }
-    };
+        };
+    }
 }
+                    
 
 function setSettingsStatus(message) {
     const status =
