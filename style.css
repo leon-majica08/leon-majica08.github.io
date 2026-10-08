@@ -1909,7 +1909,7 @@ html {
 /* Keep image and video rendering predictable */
 img,
 video {
-    content-visibility: visible;
+    content-visibility: auto;
 }
 
 .media-grid,
