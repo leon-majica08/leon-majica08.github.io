@@ -4996,9 +4996,9 @@ function initializeMusicBackgroundSettings() {
 
             updateMusicBackgroundSource();
             updateMusicBackgroundPreview();
-        });
-
-    }
+        });    
+            loadMusicGalleryPhotos();
+}
 
 /* =========================================
    LOAD PHOTOS FOR HERO BACKGROUND
