@@ -4989,8 +4989,7 @@ function initializeMusicBackgroundSettings() {
             updateMusicBackgroundPreview();
         });
 
-    loadMusicGalleryPhotos();
-}
+    }
 
 /* =========================================
    LOAD PHOTOS FOR HERO BACKGROUND
@@ -5333,6 +5332,4 @@ function initializeSiteBackgroundSettings() {
             );
         });
 
-    loadSiteBackgroundGallery();
-}
-
+    }
