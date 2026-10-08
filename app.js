@@ -1213,8 +1213,6 @@ async function initializeApp() {
 
     initializeSiteBackgroundSettings();
 
-    loadSavedStoryBackground();
-
     const messageButton =
         $("addMessageButton");
 
