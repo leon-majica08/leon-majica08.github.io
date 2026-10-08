@@ -4902,8 +4902,12 @@ function updateMusicBackgroundSource() {
 }
 
 function updateMusicBackgroundPreview() {
+
     const preview =
         document.getElementById("musicBackgroundPreview");
+
+    const player =
+        document.getElementById("musicPlayer");
 
     if (!preview) return;
 
@@ -4917,44 +4921,93 @@ function updateMusicBackgroundPreview() {
     let imageUrl = "";
 
     if (source === "upload") {
+
         const file =
             document.getElementById("musicBackgroundUpload")
                 ?.files?.[0];
 
         if (file) {
+
             if (musicBackgroundPreviewUrl) {
-                URL.revokeObjectURL(musicBackgroundPreviewUrl);
+                URL.revokeObjectURL(
+                    musicBackgroundPreviewUrl
+                );
             }
 
             musicBackgroundPreviewUrl =
                 URL.createObjectURL(file);
 
-            imageUrl = musicBackgroundPreviewUrl;
+            imageUrl =
+                musicBackgroundPreviewUrl;
         }
+
     } else {
+
         imageUrl =
             document.getElementById("musicGalleryPhoto")
-                ?.selectedOptions?.[0]?.dataset?.imageUrl || "";
+                ?.selectedOptions?.[0]
+                ?.dataset?.imageUrl || "";
     }
 
-    preview.style.filter = `brightness(${brightness}%)`;
-    preview.style.backgroundSize = "cover";
-    preview.style.backgroundPosition = "center";
+    preview.style.filter =
+        `brightness(${brightness}%)`;
+
+    preview.style.backgroundSize =
+        "cover";
+
+    preview.style.backgroundPosition =
+        "center";
 
     if (imageUrl) {
+
         preview.style.backgroundImage =
             `url("${imageUrl}")`;
 
         preview.innerHTML = "";
+
+        if (player) {
+
+            player.style.backgroundImage =
+                `linear-gradient(
+                    rgba(0,0,0,0.25),
+                    rgba(0,0,0,0.25)
+                ), url("${imageUrl}")`;
+
+            player.style.backgroundSize =
+                "cover";
+
+            player.style.backgroundPosition =
+                "center";
+
+            player.style.backgroundRepeat =
+                "no-repeat";
+
+            player.style.filter =
+                `brightness(${brightness}%)`;
+        }
+
     } else {
+
         preview.style.backgroundImage =
             "linear-gradient(135deg, #573642, #090909)";
 
         preview.innerHTML =
             "<span>Select a gallery photo or upload your own ❤️</span>";
+
+        if (player) {
+
+            player.style.backgroundImage = "";
+
+            player.style.backgroundSize = "";
+
+            player.style.backgroundPosition = "";
+
+            player.style.backgroundRepeat = "";
+
+            player.style.filter = "";
+        }
     }
 }
-
 function initializeMusicBackgroundSettings() {
     document.getElementById("musicPhotoSource")
         ?.addEventListener("change", updateMusicBackgroundSource);
