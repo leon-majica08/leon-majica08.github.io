@@ -1206,19 +1206,17 @@ async function initializeApp() {
     initializeImageViewer();
 
     initializeUploadButtons();
-   
+
     initializeSettingsControls();
-   
+
     initializeMusicBackgroundSettings();
 
     initializeSiteBackgroundSettings();
-   
+
     loadSavedStoryBackground();
- 
 
     const messageButton =
         $("addMessageButton");
-
 
     if (messageButton) {
 
@@ -1234,7 +1232,6 @@ async function initializeApp() {
         );
 
     }
-
 
     checkLogin();
 
