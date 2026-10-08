@@ -1906,9 +1906,10 @@ html {
     scroll-behavior: auto;
 }
 
+/* Keep image and video rendering predictable */
 img,
 video {
-    content-visibility: auto;
+    content-visibility: visible;
 }
 
 .media-grid,
