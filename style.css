@@ -1946,3 +1946,9 @@ video {
         background: rgba(8, 8, 8, 0.96);
     }
 }
+@media (max-width: 650px) {
+    .hero-section::before,
+    .hero-section::after {
+        filter: none;
+    }
+}
