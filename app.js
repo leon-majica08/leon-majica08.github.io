@@ -5335,4 +5335,4 @@ function initializeSiteBackgroundSettings() {
 
     loadSiteBackgroundGallery();
 }
-}
+
