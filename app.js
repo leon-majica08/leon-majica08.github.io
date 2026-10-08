@@ -38,10 +38,9 @@ const LOGIN_PASSWORD = "12082000";
 
 let currentPlaylist = [];
 let currentSongIndex = -1;
-
 let currentUploadType = null;
-
 let notificationTimer = null;
+let mediaRecordsCache = null;
 
 
 /* =========================================
@@ -1284,7 +1283,17 @@ function requireSupabase() {
 /* =========================================
    GET MEDIA RECORDS
    ========================================= */
+async function getCachedMediaRecords() {
 
+    if (mediaRecordsCache) {
+        return mediaRecordsCache;
+    }
+
+    mediaRecordsCache =
+        await getMediaRecords();
+
+    return mediaRecordsCache;
+}
 async function getMediaRecords() {
 
     requireSupabase();
@@ -4829,7 +4838,7 @@ async function loadMusicGalleryPhotos() {
     try {
         requireSupabase();
 
-        const records = await getMediaRecords();
+        const records = await getCachedMediaRecords();
 
         select.innerHTML = "";
 
@@ -5000,7 +5009,7 @@ async function loadHeroGalleryPhotos() {
     if (!select) return;
 
     try {
-        const records = await getMediaRecords();
+        const records = await getCachedMediaRecords();
 
         select.innerHTML = "";
         select.add(new Option("Choose a photo...", ""));
@@ -5042,7 +5051,7 @@ async function loadSiteBackgroundGallery() {
     if (!select) return;
 
     try {
-        const records = await getMediaRecords();
+        const records = await getCachedMediaRecords();
 
         select.innerHTML = "";
         select.add(new Option("Choose a photo...", ""));
