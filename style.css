@@ -238,13 +238,13 @@ button {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background:
-        linear-gradient(
-            135deg,
-            #281117 0%,
-            #120b0e 45%,
-            #050505 100%
-        );
+
+    /* Our Story has its own independent background */
+    background-color: #090909;
+    background-image: none;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .hero-section::before,
