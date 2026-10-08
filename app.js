@@ -1623,6 +1623,7 @@ async function loadSavedStoryBackground() {
    ========================================= */
 
 async function loadSavedSiteBackground() {
+async function loadSavedSiteBackground() {
 
     try {
 
@@ -1650,16 +1651,30 @@ async function loadSavedSiteBackground() {
         const darkness =
             1 - brightness / 100;
 
+        /*
+           ENTIRE WEBSITE BACKGROUND ONLY
+
+           This applies ONLY to the body.
+           It does NOT touch .hero-section.
+        */
+
         document.body.style.backgroundImage =
             `linear-gradient(
                 rgba(0,0,0,${darkness}),
                 rgba(0,0,0,${darkness})
             ), url("${imageUrl}")`;
 
-        document.body.style.backgroundSize = "cover";
-        document.body.style.backgroundPosition = "center";
-        document.body.style.backgroundAttachment = "fixed";
-        document.body.style.backgroundRepeat = "no-repeat";
+        document.body.style.backgroundSize =
+            "cover";
+
+        document.body.style.backgroundPosition =
+            "center";
+
+        document.body.style.backgroundAttachment =
+            "fixed";
+
+        document.body.style.backgroundRepeat =
+            "no-repeat";
 
     } catch (error) {
 
