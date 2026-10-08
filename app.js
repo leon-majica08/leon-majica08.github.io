@@ -1623,7 +1623,6 @@ async function loadSavedStoryBackground() {
    ========================================= */
 
 async function loadSavedSiteBackground() {
-async function loadSavedSiteBackground() {
 
     try {
 
