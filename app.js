@@ -1914,10 +1914,32 @@ async function handleUpload() {
         }
 
 
+        const mediaInput = $("mediaFile");
+const files = Array.from(mediaInput?.files || []);
+
+if (files.length > 1) {
+    for (let i = 0; i < files.length; i++) {
+        if (progressText) {
+            progressText.textContent =
+                `Uploading photo ${i + 1} of ${files.length}...`;
+        }
+
+        if (progressFill) {
+            progressFill.style.width =
+                `${Math.round(((i + 1) / files.length) * 100)}%`;
+        }
+
         await uploadMediaFile(
-            file,
+            files[i],
             currentUploadType
         );
+    }
+} else {
+    await uploadMediaFile(
+        file,
+        currentUploadType
+    );
+}
 
 
         if (progressFill) {
