@@ -2277,6 +2277,7 @@ function createMusicItem(item, index) {
    LOAD PHOTOS
    ========================================= */
  
+
 async function loadPhotos(records) {
     const grid = $("photoGrid");
 
@@ -2310,46 +2311,64 @@ async function loadPhotos(records) {
         return;
     }
 
-    // Display photo cards as their URLs become available.
-    const results = await Promise.allSettled(
-        photos.map(async item => {
-            const url = await getSignedUrl(item.file_path);
+    const batchSize = 8;
 
-            if (!url) {
-                throw new Error(
-                    "Photo URL unavailable: " + item.file_path
+    for (
+        let start = 0;
+        start < photos.length;
+        start += batchSize
+    ) {
+        const batch = photos.slice(
+            start,
+            start + batchSize
+        );
+
+        const results = await Promise.allSettled(
+            batch.map(async item => {
+                const url = await getSignedUrl(
+                    item.file_path
+                );
+
+                if (!url) {
+                    throw new Error(
+                        "Photo URL unavailable: " +
+                        item.file_path
+                    );
+                }
+
+                const photoIndex = viewerPhotoList.findIndex(
+                    photo =>
+                        String(photo.id) === String(item.id)
+                );
+
+                if (photoIndex !== -1) {
+                    viewerPhotoList[photoIndex].signed_url =
+                        url;
+                }
+
+                return createPhotoCard({
+                    ...item,
+                    signed_url: url
+                });
+            })
+        );
+
+        for (const result of results) {
+            if (result.status === "fulfilled") {
+                grid.insertAdjacentHTML(
+                    "beforeend",
+                    result.value
+                );
+            } else {
+                console.error(
+                    "Photo display error:",
+                    result.reason
                 );
             }
-
-            const photoIndex = viewerPhotoList.findIndex(
-                photo => String(photo.id) === String(item.id)
-            );
-
-            if (photoIndex !== -1) {
-                viewerPhotoList[photoIndex].signed_url = url;
-            }
-
-            return createPhotoCard({
-                ...item,
-                signed_url: url
-            });
-        })
-    );
-
-    for (const result of results) {
-        if (result.status === "fulfilled") {
-            grid.insertAdjacentHTML(
-                "beforeend",
-                result.value
-            );
-        } else {
-            console.error(
-                "Photo display error:",
-                result.reason
-            );
         }
     }
 }
+
 
 
 /* =========================================
