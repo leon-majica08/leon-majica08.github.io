@@ -5069,28 +5069,35 @@ function updateMusicBackgroundPreview() {
 
     let imageUrl = "";
 
-    if (source === "upload") {
+    
+if (source === "upload") {
 
-        const file =
-            document.getElementById("musicBackgroundUpload")
-                ?.files?.[0];
+    const file =
+        document.getElementById("musicBackgroundUpload")
+            ?.files?.[0];
 
-        if (file) {
+    if (file) {
 
-            if (musicBackgroundPreviewUrl) {
-                URL.revokeObjectURL(
-                    musicBackgroundPreviewUrl
-                );
-            }
-
-            musicBackgroundPreviewUrl =
-                URL.createObjectURL(file);
-
-            imageUrl =
-                musicBackgroundPreviewUrl;
+        if (musicBackgroundPreviewUrl) {
+            URL.revokeObjectURL(
+                musicBackgroundPreviewUrl
+            );
         }
 
+        musicBackgroundPreviewUrl =
+            URL.createObjectURL(file);
+
+        imageUrl =
+            musicBackgroundPreviewUrl;
+
     } else {
+
+        imageUrl =
+            musicBackgroundSavedUploadUrl || "";
+    }
+
+} else {
+
 
         imageUrl =
             document.getElementById("musicGalleryPhoto")
