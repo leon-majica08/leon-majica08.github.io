@@ -5012,6 +5012,12 @@ async function loadMusicGalleryPhotos() {
             if (style) {
                 style.value = saved.style || "default";
             }
+           
+if (saved.uploadPath) {
+    musicBackgroundSavedUploadUrl =
+        await getSignedUrl(saved.uploadPath);
+}
+
 
             updateMusicBackgroundSource();
         } else {
@@ -5207,10 +5213,34 @@ document.getElementById("musicGalleryPhoto")
         saveMusicBackgroundPreferences();
     });
 
+
 document.getElementById("musicBackgroundUpload")
-    ?.addEventListener("change", () => {
-        updateMusicBackgroundPreview();
-        saveMusicBackgroundPreferences();
+    ?.addEventListener("change", async () => {
+        const file =
+            document.getElementById("musicBackgroundUpload")
+                ?.files?.[0];
+
+        if (!file) return;
+
+        try {
+            const filePath =
+                await uploadMusicBackgroundPhoto(file);
+
+            musicBackgroundSavedUploadUrl =
+                await getSignedUrl(filePath);
+
+            updateMusicBackgroundPreview();
+
+        } catch (error) {
+            console.error(
+                "Music background upload failed:",
+                error
+            );
+
+            alert(
+                "Could not save the music background photo. Please try again."
+            );
+        }
     });
 
 document.getElementById("musicBrightness")
