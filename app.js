@@ -2717,22 +2717,16 @@ async function loadAllMemories() {
         );
 
 
+        
         await loadRecentMemories(records);
 
+        loadMusic(records);
 
-        await loadPhotos(
-            records
-        );
+        await Promise.allSettled([
+            loadPhotos(records),
+            loadVideos(records)
+        ]);
 
-
-        await loadVideos(
-            records
-        );
-
-
-        loadMusic(
-            records
-        );
 
 
         /*
