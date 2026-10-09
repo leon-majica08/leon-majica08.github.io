@@ -4843,6 +4843,8 @@ function initializeSettingsControls() {
 
 let musicBackgroundPreviewUrl = "";
 
+let musicBackgroundSavedUploadUrl = "";
+
 async function uploadMusicBackgroundPhoto(file) {
     if (!file) {
         throw new Error("Please choose a photo first.");
@@ -4874,7 +4876,7 @@ async function uploadMusicBackgroundPhoto(file) {
     const savedPath = data?.path || filePath;
 
     const settings = {
-        source: "savedUpload",
+        source: "upload",
         uploadPath: savedPath,
         galleryPhoto: "",
         brightness:
