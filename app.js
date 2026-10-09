@@ -2120,12 +2120,13 @@ function createPhotoCard(item) {
         <div class="media-card">
             <div class="media-image-wrap">
                 <img
-                    src="${url}"
-                    alt="${escapeHtml(item.file_name)}"
-                    class="media-image"
-                    onclick="openImageViewerForPhoto('${item.id}')"
-                >
-            </div>
+    src="${url}"
+    alt="${escapeHtml(item.file_name)}"
+    class="media-image"
+    loading="lazy"
+    decoding="async"
+    onclick="openImageViewerForPhoto('${item.id}')"
+>
 
             <div class="media-info">
 
