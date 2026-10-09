@@ -1670,7 +1670,7 @@ async function loadSavedSiteBackground() {
             "center";
 
         document.body.style.backgroundAttachment =
-            "fixed";
+    "fixed";
 
         document.body.style.backgroundRepeat =
             "no-repeat";
