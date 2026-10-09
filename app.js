@@ -5143,17 +5143,33 @@ function updateMusicBackgroundPreview() {
         "no-repeat";
 }
 function initializeMusicBackgroundSettings() {
-    document.getElementById("musicPhotoSource")
-        ?.addEventListener("change", updateMusicBackgroundSource);
+    
+document.getElementById("musicPhotoSource")
+    ?.addEventListener("change", () => {
+        updateMusicBackgroundSource();
+        saveMusicBackgroundPreferences();
+    });
 
-    document.getElementById("musicGalleryPhoto")
-        ?.addEventListener("change", updateMusicBackgroundPreview);
+document.getElementById("musicGalleryPhoto")
+    ?.addEventListener("change", () => {
+        updateMusicBackgroundPreview();
+        saveMusicBackgroundPreferences();
+    });
 
-    document.getElementById("musicBackgroundUpload")
-        ?.addEventListener("change", updateMusicBackgroundPreview);
+document.getElementById("musicBackgroundUpload")
+    ?.addEventListener("change", () => {
+        updateMusicBackgroundPreview();
+        saveMusicBackgroundPreferences();
+    });
 
-    document.getElementById("musicBrightness")
-        ?.addEventListener("input", updateMusicBackgroundPreview);
+document.getElementById("musicBrightness")
+    ?.addEventListener("change", () => {
+        updateMusicBackgroundPreview();
+        saveMusicBackgroundPreferences();
+    });
+
+document.getElementById("musicPlayerBackground")
+    ?.addEventListener("change", saveMusicBackgroundPreferences);
 
     document.getElementById("previewMusicBackgroundButton")
         ?.addEventListener("click", updateMusicBackgroundPreview);
