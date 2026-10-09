@@ -4912,9 +4912,63 @@ async function loadMusicGalleryPhotos() {
             select.add(option);
         }
 
-        updateMusicBackgroundPreview();
+        
+        // Restore previously saved music background settings
+        let saved = null;
+
+        try {
+            saved = JSON.parse(
+                localStorage.getItem(
+                    "leonMajicaMusicBackgroundSettings"
+                ) || "null"
+            );
+        } catch (error) {
+            console.error(
+                "Could not read saved music background settings:",
+                error
+            );
+        }
+
+        if (saved) {
+            const source =
+                document.getElementById("musicPhotoSource");
+
+            const gallery =
+                document.getElementById("musicGalleryPhoto");
+
+            const brightness =
+                document.getElementById("musicBrightness");
+
+            const style =
+                document.getElementById("musicPlayerBackground");
+
+            if (source) source.value = saved.source || "gallery";
+
+            if (
+                gallery &&
+                saved.galleryPhoto &&
+                [...gallery.options].some(
+                    option => option.value === saved.galleryPhoto
+                )
+            ) {
+                gallery.value = saved.galleryPhoto;
+            }
+
+            if (brightness) {
+                brightness.value = saved.brightness || "75";
+            }
+
+            if (style) {
+                style.value = saved.style || "default";
+            }
+
+            updateMusicBackgroundSource();
+        } else {
+            updateMusicBackgroundPreview();
+        }
 
     } catch (error) {
+
         console.error("Could not load music background photos:", error);
         select.innerHTML = "";
         select.add(new Option("Could not load gallery photos", ""));
