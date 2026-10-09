@@ -497,6 +497,7 @@ button {
     border: 1px solid #252525;
     border-radius: 16px;
     background: #111;
+    content-visibility: auto;
 }
 
 .media-card img,
