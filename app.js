@@ -4843,6 +4843,55 @@ function initializeSettingsControls() {
 
 let musicBackgroundPreviewUrl = "";
 
+async function uploadMusicBackgroundPhoto(file) {
+    if (!file) {
+        throw new Error("Please choose a photo first.");
+    }
+
+    requireSupabase();
+
+    const safeName = file.name.replace(
+        /[^a-zA-Z0-9._-]/g,
+        "_"
+    );
+
+    const filePath =
+        "music-backgrounds/" +
+        Date.now() + "-" + safeName;
+
+    const { data, error } = await supabaseClient
+        .storage
+        .from(STORAGE_BUCKET)
+        .upload(filePath, file, {
+            contentType: file.type,
+            upsert: false
+        });
+
+    if (error) {
+        throw error;
+    }
+
+    const savedPath = data?.path || filePath;
+
+    const settings = {
+        source: "savedUpload",
+        uploadPath: savedPath,
+        galleryPhoto: "",
+        brightness:
+            document.getElementById("musicBrightness")?.value || "75",
+        style:
+            document.getElementById("musicPlayerBackground")?.value || "default"
+    };
+
+    localStorage.setItem(
+        "leonMajicaMusicBackgroundSettings",
+        JSON.stringify(settings)
+    );
+
+    return savedPath;
+}
+
+
 function saveMusicBackgroundPreferences() {
     try {
         localStorage.setItem(
