@@ -5600,7 +5600,7 @@ function initializeSiteBackgroundSettings() {
         });
 
     document.getElementById("resetSiteBackgroundButton")
-        ?.addEventListener("click", () => {
+        ?.addEventListener("click", async () => {
 
             const source =
                 document.getElementById("siteBackgroundSource");
@@ -5618,6 +5618,22 @@ function initializeSiteBackgroundSettings() {
             if (photo) photo.value = "";
             if (upload) upload.value = "";
             if (brightness) brightness.value = 45;
+
+           try {
+    await saveSiteBackgroundSettings(
+        "",
+        "gallery",
+        45
+    );
+} catch (error) {
+    console.error("Website background reset failed:", error);
+
+    setSettingsStatus(
+        "Could not reset the saved website background."
+    );
+
+    return;
+           }
 
             document.body.style.backgroundImage = "";
             document.body.style.backgroundSize = "";
