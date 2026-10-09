@@ -5390,7 +5390,7 @@ function initializeSiteBackgroundSettings() {
                     "center";
 
                 document.body.style.backgroundAttachment =
-    "scroll";
+                    "fixed";
 
                 document.body.style.backgroundRepeat =
                     "no-repeat";
@@ -5414,15 +5414,8 @@ function initializeSiteBackgroundSettings() {
 
         });
 
-    
-document.getElementById("resetSiteBackgroundButton")
-    ?.addEventListener("click", async () => {
-        try {
-            await saveSiteBackgroundSettings(
-                null,
-                "gallery",
-                45
-            );
+    document.getElementById("resetSiteBackgroundButton")
+        ?.addEventListener("click", () => {
 
             const source =
                 document.getElementById("siteBackgroundSource");
@@ -5444,21 +5437,14 @@ document.getElementById("resetSiteBackgroundButton")
             document.body.style.backgroundImage = "";
             document.body.style.backgroundSize = "";
             document.body.style.backgroundPosition = "";
-            document.body.style.backgroundAttachment = "scroll";
+            document.body.style.backgroundAttachment = "";
             document.body.style.backgroundRepeat = "";
 
             updateSiteBackgroundSource();
 
             setSettingsStatus(
-                "Website background reset successfully."
+                "Website background reset for this page."
             );
+        });
 
-        } catch (error) {
-            console.error("Website background reset error:", error);
-
-            setSettingsStatus(
-                "Could not reset website background: " +
-                (error?.message || "Unknown error.")
-            );
-        }
-    });
+    }
