@@ -2279,6 +2279,7 @@ function createMusicItem(item, index) {
  
 async function loadPhotos(records) {
     const grid = $("photoGrid");
+
     if (!grid) {
         console.error("Photo gallery element #photoGrid not found.");
         return;
@@ -2287,16 +2288,17 @@ async function loadPhotos(records) {
     grid.innerHTML = "";
 
     const photos = (records || []).filter(item =>
-    item.file_type === "photo" ||
-    item.file_type === "image" ||
-    (item.mime_type || "").startsWith("image/")
-);
-   viewerPhotoList = photos.map(item => ({
-    ...item,
-    signed_url: "",
-}));
+        item.file_type === "photo" ||
+        item.file_type === "image" ||
+        (item.mime_type || "").startsWith("image/")
+    );
 
-viewerPhotoIndex = 0;
+    viewerPhotoList = photos.map(item => ({
+        ...item,
+        signed_url: ""
+    }));
+
+    viewerPhotoIndex = 0;
 
     if (photos.length === 0) {
         grid.innerHTML = `
@@ -2308,34 +2310,47 @@ viewerPhotoIndex = 0;
         return;
     }
 
-    for (const item of photos) {
-        try {
+    // Display photo cards as their URLs become available.
+    const results = await Promise.allSettled(
+        photos.map(async item => {
             const url = await getSignedUrl(item.file_path);
 
             if (!url) {
-                console.error("Photo URL unavailable:", item.file_path);
-                continue;
+                throw new Error(
+                    "Photo URL unavailable: " + item.file_path
+                );
             }
 
             const photoIndex = viewerPhotoList.findIndex(
-    photo => String(photo.id) === String(item.id)
-);
+                photo => String(photo.id) === String(item.id)
+            );
 
-if (photoIndex !== -1) {
-    viewerPhotoList[photoIndex].signed_url = url;
-}
+            if (photoIndex !== -1) {
+                viewerPhotoList[photoIndex].signed_url = url;
+            }
 
-const card = createPhotoCard({
-    ...item,
-    signed_url: url
-});
+            return createPhotoCard({
+                ...item,
+                signed_url: url
+            });
+        })
+    );
 
-            grid.insertAdjacentHTML("beforeend", card);
-        } catch (error) {
-            console.error("Photo display error:", error);
+    for (const result of results) {
+        if (result.status === "fulfilled") {
+            grid.insertAdjacentHTML(
+                "beforeend",
+                result.value
+            );
+        } else {
+            console.error(
+                "Photo display error:",
+                result.reason
+            );
         }
     }
 }
+
 
 /* =========================================
    LOAD VIDEOS
