@@ -4843,6 +4843,33 @@ function initializeSettingsControls() {
 
 let musicBackgroundPreviewUrl = "";
 
+function saveMusicBackgroundPreferences() {
+    try {
+        localStorage.setItem(
+            "leonMajicaMusicBackgroundSettings",
+            JSON.stringify({
+                source:
+                    document.getElementById("musicPhotoSource")?.value || "gallery",
+
+                galleryPhoto:
+                    document.getElementById("musicGalleryPhoto")?.value || "",
+
+                brightness:
+                    document.getElementById("musicBrightness")?.value || "75",
+
+                style:
+                    document.getElementById("musicPlayerBackground")?.value || "default"
+            })
+        );
+    } catch (error) {
+        console.error(
+            "Could not save music background preferences:",
+            error
+        );
+    }
+}
+
+
 async function loadMusicGalleryPhotos() {
     const select =
         document.getElementById("musicGalleryPhoto");
