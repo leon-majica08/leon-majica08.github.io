@@ -5390,7 +5390,7 @@ function initializeSiteBackgroundSettings() {
                     "center";
 
                 document.body.style.backgroundAttachment =
-                    "fixed";
+    "scroll";
 
                 document.body.style.backgroundRepeat =
                     "no-repeat";
