@@ -1852,15 +1852,18 @@ async function handleUpload() {
     }
 
 
-    if (
-        !isValidFileForType(
-            file,
-            currentUploadType
-        )
-    ) {
+        const files = Array.from(fileInput.files || []);
+
+    if (files.some(
+        selectedFile =>
+            !isValidFileForType(
+                selectedFile,
+                currentUploadType
+            )
+    )) {
 
         showNotification(
-            "That file type is not valid here.",
+            "One or more files have an invalid type.",
             "⚠️"
         );
 
@@ -1913,9 +1916,6 @@ async function handleUpload() {
 
         }
 
-
-        const mediaInput = $("mediaFile");
-const files = Array.from(mediaInput?.files || []);
 
 if (files.length > 1) {
     for (let i = 0; i < files.length; i++) {
