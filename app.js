@@ -2377,6 +2377,7 @@ async function loadPhotos(records) {
 
 async function loadVideos(records) {
     const grid = $("videoGrid");
+
     if (!grid) {
         console.error("Video gallery element #videoGrid not found.");
         return;
@@ -2385,9 +2386,9 @@ async function loadVideos(records) {
     grid.innerHTML = "";
 
     const videos = (records || []).filter(item =>
-    item.file_type === "video" ||
-    (item.mime_type || "").startsWith("video/")
-);
+        item.file_type === "video" ||
+        (item.mime_type || "").startsWith("video/")
+    );
 
     if (videos.length === 0) {
         grid.innerHTML = `
@@ -2399,23 +2400,40 @@ async function loadVideos(records) {
         return;
     }
 
-    for (const item of videos) {
-        try {
-            const url = await getSignedUrl(item.file_path);
+    const batchSize = 8;
 
-            if (!url) {
-                console.error("Video URL unavailable:", item.file_path);
-                continue;
+    for (let start = 0; start < videos.length; start += batchSize) {
+        const batch = videos.slice(start, start + batchSize);
+
+        const results = await Promise.allSettled(
+            batch.map(async item => {
+                const url = await getSignedUrl(item.file_path);
+
+                if (!url) {
+                    throw new Error(
+                        "Video URL unavailable: " + item.file_path
+                    );
+                }
+
+                return createVideoCard({
+                    ...item,
+                    signed_url: url
+                });
+            })
+        );
+
+        for (const result of results) {
+            if (result.status === "fulfilled") {
+                grid.insertAdjacentHTML(
+                    "beforeend",
+                    result.value
+                );
+            } else {
+                console.error(
+                    "Video display error:",
+                    result.reason
+                );
             }
-
-            const card = createVideoCard({
-                ...item,
-                signed_url: url
-            });
-
-            grid.insertAdjacentHTML("beforeend", card);
-        } catch (error) {
-            console.error("Video display error:", error);
         }
     }
 }
