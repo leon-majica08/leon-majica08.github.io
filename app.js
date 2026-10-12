@@ -3103,15 +3103,33 @@ function createMessageCard(
 
 
     card.innerHTML = `
-        <h3>${title}</h3>
+    <h3>${title}</h3>
 
-        <p>${text}</p>
+    <p>${text}</p>
 
-        <span class="message-date">
-            ${escapeHtml(date)}
-        </span>
-    `;
+    <span class="message-date">
+        ${escapeHtml(date)}
+    </span>
 
+    <button
+        type="button"
+        class="delete-message-button"
+    >
+        🗑️ Delete
+    </button>
+`;
+
+card.querySelector(
+    ".delete-message-button"
+).addEventListener("click", async function () {
+
+    if (!confirm("Are you sure you want to delete this message?")) {
+        return;
+    }
+
+    await deleteMessage(message.id);
+
+});
 
     return card;
 
