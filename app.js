@@ -2710,6 +2710,7 @@ async function loadAllMemories() {
 
         const records =
             await getMediaRecords();
+       loadMessages();
 
 
         updateMemoryCounts(
@@ -2726,22 +2727,6 @@ async function loadAllMemories() {
             loadPhotos(records),
             loadVideos(records)
         ]);
-
-
-
-        /*
-           Messages are loaded by the next
-           section of app.js.
-        */
-
-        if (
-            typeof loadMessages ===
-            "function"
-        ) {
-
-            await loadMessages();
-
-        }
 
 
     } catch (error) {
