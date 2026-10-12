@@ -3164,9 +3164,9 @@ async function saveMessage(
     } = await supabaseClient
         .from(MESSAGE_TABLE)
         .insert({
-            title: cleanTitle,
-            message: cleanMessage
-        })
+    title: cleanTitle,
+    content: cleanMessage
+})
         .select()
         .single();
 
