@@ -3212,8 +3212,13 @@ async function saveMessage(
 
 function initializeMessageForm() {
 
-    const form =
-        $("messageForm");
+    const form = $("messageForm");
+
+if (!form || form.dataset.saveHandlerAttached === "true") {
+    return;
+}
+
+form.dataset.saveHandlerAttached = "true";
 
 
     if (!form) {
