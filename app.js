@@ -2182,15 +2182,16 @@ function createVideoCard(item) {
         <div class="media-card">
             <div class="media-video-wrap">
                 <video
-                    class="media-video"
-                    controls
-                    preload="metadata"
-                >
-                    <source
-                        src="${url}"
-                        type="${item.mime_type || "video/mp4"}"
-                    >
-                </video>
+    class="media-video"
+    controls
+    playsinline
+    preload="metadata"
+>
+    <source
+        src="${url}"
+        type="${item.mime_type || "video/mp4"}"
+    >
+</video>
             </div>
 
             <div class="media-info">
