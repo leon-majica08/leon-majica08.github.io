@@ -2730,18 +2730,22 @@ async function loadAllMemories() {
 
     } catch (error) {
 
-        console.error(
-            "Could not load memories:",
-            error
-        );
+    console.error(
+        "Could not load memories:",
+        error
+    );
 
+    console.error(
+        "Error details:",
+        error?.message,
+        error?.stack
+    );
 
-        showNotification(
-            "Could not load your memories.",
-            "⚠️"
-        );
-
-    }
+    showNotification(
+        "Could not load your memories: " +
+        (error?.message || "Unknown error"),
+        "⚠️"
+    );
 
 }
 
