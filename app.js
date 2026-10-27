@@ -2690,34 +2690,24 @@ async function loadRecentMemories(records) {
    LOAD ALL MEMORIES
    ========================================= */
 
+
 async function loadAllMemories() {
 
     if (!supabaseClient) {
-
-        const initialized =
-            await initializeSupabase();
-
+        const initialized = await initializeSupabase();
 
         if (!initialized) {
             return;
         }
-
     }
 
-
     try {
+        const records = await getMediaRecords();
 
-        const records =
-            await getMediaRecords();
-       loadMessages();
+        loadMessages();
 
+        updateMemoryCounts(records);
 
-        updateMemoryCounts(
-            records
-        );
-
-
-        
         await loadRecentMemories(records);
 
         loadMusic(records);
@@ -2727,27 +2717,21 @@ async function loadAllMemories() {
             loadVideos(records)
         ]);
 
-
     } catch (error) {
 
-    console.error(
-        "Could not load memories:",
-        error
-    );
+        console.error(
+            "Could not load memories:",
+            error
+        );
 
-    console.error(
-        "Error details:",
-        error?.message,
-        error?.stack
-    );
+        showNotification(
+            "Could not load your memories.",
+            "⚠️"
+        );
 
-    showNotification(
-        "Could not load your memories: " +
-        (error?.message || "Unknown error"),
-        "⚠️"
-    );
-
+    }
 }
+
 
 
 /* =========================================
