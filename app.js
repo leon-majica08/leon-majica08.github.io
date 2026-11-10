@@ -2712,10 +2712,7 @@ async function loadAllMemories() {
 
         loadMusic(records);
 
-        await Promise.allSettled([
-            loadPhotos(records),
-            loadVideos(records)
-        ]);
+        // Photos and Videos are loaded when their tabs are opened.
 
     } catch (error) {
 
